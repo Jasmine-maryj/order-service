@@ -7,7 +7,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -15,15 +14,17 @@ import java.util.List;
 @NoArgsConstructor
 @Entity
 @Builder
+@Table(name = "order_tbl")
 public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long orderId;
+    private Long id;
     private Long userId;
     private String orderNumber;
 
     @OneToMany(cascade = CascadeType.ALL)
     private List<OrderItems> orderItemsList;
+
+    @Enumerated(EnumType.STRING)
     private OrderStatus status;
-    private LocalDateTime localDateTime;
 }

@@ -8,10 +8,8 @@ import com.dev.orderservice.utils.OrderStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 public class OrderServiceImpl implements OrderService{
@@ -31,8 +29,6 @@ public class OrderServiceImpl implements OrderService{
 
         order.setUserId(orderDto.getUserId());
         order.setStatus(OrderStatus.CREATED);
-        order.setLocalDateTime(LocalDateTime.now());
-
         orderRepository.save(order);
         return order;
     }
@@ -41,6 +37,7 @@ public class OrderServiceImpl implements OrderService{
         OrderItems orderItems1 = new OrderItems();
         orderItems1.setQuantity(orderItems.getQuantity());
         orderItems1.setPrice(orderItems.getPrice());
+        orderItems1.setProductName(orderItems.getProductName());
         return orderItems1;
     }
 }
