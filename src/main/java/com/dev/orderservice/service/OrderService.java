@@ -1,8 +1,12 @@
 package com.dev.orderservice.service;
 
 import com.dev.orderservice.dto.OrderDto;
-import com.dev.orderservice.entity.Order;
+
+import reactor.core.publisher.Mono;
+
 
 public interface OrderService {
-    Order placeOrder(OrderDto orderDto);
+    String placeOrder(OrderDto orderDto);
+
+    Mono<String> checkInventoryAndPlaceOrder(String name);
 }
