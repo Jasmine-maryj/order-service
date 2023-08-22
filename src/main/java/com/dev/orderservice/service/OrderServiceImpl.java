@@ -4,6 +4,7 @@ import com.dev.orderservice.dto.OrderDto;
 import com.dev.orderservice.entity.InventoryResponse;
 import com.dev.orderservice.entity.Order;
 import com.dev.orderservice.entity.OrderItems;
+import com.dev.orderservice.handler.ResourceNotFoundException;
 import com.dev.orderservice.repository.OrderRepository;
 import com.dev.orderservice.utils.OrderStatus;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -34,10 +36,34 @@ public class OrderServiceImpl implements OrderService{
 
         List<OrderItems> orderItemsList = orderDto.getOrderItemsList()
                 .stream().map(this::mapToDto).toList();
+
         order.setOrderItemsList(orderItemsList);
         order.setUserId(orderDto.getUserId());
         order.setStatus(OrderStatus.CREATED);
-        return "";
+
+        List<String> names = orderDto.getOrderItemsList().stream()
+                .map(OrderItems::getProductName)
+                .toList();
+
+        try {
+            InventoryResponse[] inventoryResponseArray = webClientBuilder.build().get()
+                    .uri("http://localhost:8084/api/v1/inventory/available-products",
+                            uriBuilder -> uriBuilder.queryParam("names", names).build())
+                    .retrieve()
+                    .bodyToMono(InventoryResponse[].class)
+                    .block();
+
+            assert inventoryResponseArray != null;
+            boolean allProductsInStock = Arrays.stream(inventoryResponseArray)
+                    .allMatch(InventoryResponse::isStock);
+
+            if (allProductsInStock) {
+                orderRepository.save(order);
+            }
+            return "Order Placed successfully";
+        }catch (Exception exception){
+            throw new IllegalArgumentException("Product is out of stock");
+        }
 
     }
 
