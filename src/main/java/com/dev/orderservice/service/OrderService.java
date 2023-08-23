@@ -4,9 +4,11 @@ import com.dev.orderservice.dto.OrderDto;
 
 import reactor.core.publisher.Mono;
 
+import java.util.Map;
+
 
 public interface OrderService {
-    String placeOrder(OrderDto orderDto);
+    Map<String, String> placeOrder(OrderDto orderDto);
 
     Mono<String> checkInventoryAndPlaceOrder(String name);
 }
